@@ -39,10 +39,16 @@ INSTALLED_APPS = [
     'workouts.apps.WorkoutsConfig',
     'health.apps.HealthConfig',
     'ckeditor',
+    'drf_yasg',
     'ckeditor_uploader',
     'cloudinary',
     'rest_framework',
+    'oauth2_provider',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('oauth2_provider.contrib.rest_framework.OAuth2Authentication',)
+}
 
 import cloudinary
 
@@ -141,3 +147,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CLIENT_ID = 'IdTp5paUfJIpo1YGID4cmUOJoqn0ww7v8XeuV4qb'
+CLIENT_SECRET = 'gPO3TVVHZpXKarmhK46ZugN9Hh2yJJ0pTVM5OqpVic5obpYIqjbHN2Udal08XPvrlppK5B4Bspw5S8SuqCah1F2BWvlVZ2xAN86nKRSoVBCHIkFxEFuXpHlbelCYtCKX'
+
+
