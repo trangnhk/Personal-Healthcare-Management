@@ -108,7 +108,7 @@ class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView):
         except User.DoesNotExist:
             return Response({"error": "EXPERT NOT FOUND"}, status=status.HTTP_404_NOT_FOUND)
 
-        chats = Chatting.object.filter(sender=user, receiver=other_user) | Chatting.objects.filter(sender=other_user, receiver=user)
+        chats = Chatting.objects.filter(sender=user, receiver=other_user) | Chatting.objects.filter(sender=other_user, receiver=user)
         chats = chats.select_related("sender", "receiver").order_by("sent_at")
 
         serializer = ChattingSerializer(chats, many=True)

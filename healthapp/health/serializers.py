@@ -2,11 +2,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
+from accounts.models import UserRole
+
+
 class HealthMetricSerializer(ModelSerializer):
     class Meta:
         model = HealthMetric
         fields = [
             "id",
+            "workout_plan",
             "water_intake",
             "steps",
             "heart_rate",
@@ -43,9 +47,45 @@ class HealthDiarySerializer(ModelSerializer):
         request = self.context.get("request")
 
         # Not allowed update another user
-        if request and request.user != instance:
+        if request and request.user != instance.user:
             raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER!"})
 
-        new_content = validated_data.pop("content", None)
+        allowed_fields = {"content"}
+        if set(validated_data.keys()) - allowed_fields:
+            raise ValidationError({"error": "ONLY CONTENT CAN BE UPDATED"})
 
-        
+        return super().update(instance, validated_data)
+
+class ReminderSerializer(ModelSerializer):
+    class Meta:
+        model = Reminder
+        fields = [
+            "id",
+            "workout_plan",
+            "message",
+            "remind_at",
+            "is_done",
+        ]
+        read_only_fields = ["id", "is_done"]
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        user = request.user
+
+        if user.role != UserRole.CLIENT:
+            raise ValidationError({"error": "ONLY CLIENT CAN CREATE REMINDER"})
+
+        return Reminder.objects.create(user=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        user = request.user
+
+        if user != instance.user:
+            raise ValidationError({"error": "YOU CANNOT UPDATE THIS REMINDER"})
+
+        allowed_fields = {"message", "remind_at", "workout_plan"}
+        if set(validated_data.keys()) - allowed_fields:
+            raise ValidationError({"error": "THIS FIELD CANNOT BE UPDATED"})
+
+        return super().update(instance, validated_data)

@@ -3,9 +3,21 @@ from django.conf import settings
 from accounts.models import UserRole
 from workouts.models import WorkoutPlan
 from ckeditor.fields import RichTextField
+from django.utils import timezone
 
+class SoftDeleteModel(models.Model):
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
-class HealthMetric(models.Model):
+    class Meta:
+        abstract = True
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
+
+class HealthMetric(SoftDeleteModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="health_metrics")
     workout_plan = models.ForeignKey(WorkoutPlan, on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name="metrics")
