@@ -78,17 +78,18 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
         serializer = ClientDetailSerializer(client)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView):
+class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChattingSerializer
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         user = request.user
 
         chats = Chatting.objects.filter(sender=user) | Chatting.objects.filter(receiver=user)
 
         chats = chats.select_related("sender", "receiver").order_by("-sent_at")
 
-        serializer = ChattingSerializer(chats, many=True)
+        serializer = self.get_serializer(chats, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 

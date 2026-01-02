@@ -1,22 +1,25 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.db.models import Sum
 from django.utils.timezone import now
 from rest_framework import viewsets, generics, status, parsers, permissions
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .serializers import HealthMetricSerializer, HealthDiarySerializer
-from .models import HealthMetric, HealthDiary
+from .serializers import HealthMetricSerializer, HealthDiarySerializer, ReminderSerializer
+from .models import HealthMetric, HealthDiary, Reminder
+from workouts.models import WorkoutPlan
 
 
 class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView,
                           generics.UpdateAPIView):
     serializer_class = HealthMetricSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "patch", "delete"]
 
     def get_queryset(self):
-        user = self.resquest.user
+        user = self.request.user
 
         return HealthMetric.objects.filter(user=user, is_deleted=False).select_related("workout_plan").order_by("-recorded_at")
 
@@ -32,16 +35,16 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
         metric = self.get_object()
 
         if metric.user != request.user:
-            return Response({"error": "YOU CANNOT UPDATE THIS METRIC"}, status=status.HTTP_403_FORBIDDEN)
+            return ValidationError({"error": "YOU CANNOT UPDATE THIS METRIC"})
 
         return super().update(request, *args, **kwargs)
 
     @action(methods=["post"], detail=True, url_path="soft_delete")
-    def soft_delete(self, request, pk=None):
+    def soft_delete(self, request):
         metric = self.get_object()
 
         if metric.user != request.user:
-            return Response({"error": "YOU CANNOT DELETE THIS METRIC"}, status=status.HTTP_403_FORBIDDEN)
+            return ValidationError({"error": "YOU CANNOT DELETE THIS METRIC"})
 
         metric.soft_delete()
 
@@ -68,13 +71,111 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
 
         return Response(data, status=status.HTTP_200_OK)
 
-# class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.RetrieveAPIView, generics.ListAPIView, generics.DestroyAPIView):
-#     serializer_class = HealthDiarySerializer
-#     permission_classes = [permissions.IsAuthenticated]
+class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
+    serializer_class = HealthDiarySerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "patch", "delete"]
 
+    def get_queryset(self):
+        user = self.request.user
 
+        return HealthDiary.objects.filter(user=user).select_related("workout_plan").order_by("-created_date")
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
 
+        diary = serializer.save()
 
+        return Response(self.get_serializer(diary).data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        diary = self.get_object()
+
+        if diary.user != request.user:
+            raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER'S DIARY"})
+
+        diary.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def update(self, request, *args, **kwargs):
+        diary = self.get_object()
+
+        if diary.user != request.user:
+            raise ValidationError({"error": "YOU CANNOT UPDATE THIS DIARY"})
+
+        return super().update(request, *args, **kwargs)
+
+    @action(methods=["get"], detail=False, url_path="by-date")
+    def get_diary_by_date(self, request):
+        user = self.request.user
+
+        date_str = request.query_params.get("date")
+        if not date_str:
+            raise ValidationError({"date": "YOU NEED TO PROVIDE DATE"})
+
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValidationError({"date": "INVALID DATE FORMAT"})
+
+        diaries = HealthDiary.objects.filter(user=user, created_date__date=date).select_related("workout_plan").order_by("created_date")
+
+        serializer = self.get_serializer(diaries, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=["get"], detail=False, url_path="by-workout")
+    def get_diary_by_workout(self, request):
+        user = request.user
+        workout_plan_id = request.query_params.get("workout_plan")
+
+        print(workout_plan_id)
+        print("Current user:", request.user, request.user.id)
+
+        if not workout_plan_id:
+            raise ValidationError({"workout_plan": "YOU NEED TO PROVIDE WORKOUT PLAN"})
+
+        try:
+            workout_plan = WorkoutPlan.objects.get(id=workout_plan_id)
+            print(workout_plan)
+        except WorkoutPlan.DoesNotExist:
+            raise ValidationError({"workout_plan": "INVALID WORKOUT PLAN"})
+
+        diaries = (
+            HealthDiary.objects
+            .filter(user=user, workout_plan_id=workout_plan_id)
+            .select_related("workout_plan")
+            .order_by("-created_date")
+        )
+        if not diaries.exists():
+            raise ValidationError({"workout_plan": "NO DIARY FOUND FOR THIS WORKOUT PLAN"})
+
+        serializer = self.get_serializer(diaries, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.UpdateAPIView):
+    serializer_class = ReminderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ["get", "post", "patch"]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        reminder = serializer.save()
+
+        return Response(self.get_serializer(reminder).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        pass
+
+    def list(self, request, *args, **kwargs):
+        pass
+
+    @action(methods=["post"], detail=True, url_path="set_done")
+    def set_done_reminder(self, request):
+        pass
 
 

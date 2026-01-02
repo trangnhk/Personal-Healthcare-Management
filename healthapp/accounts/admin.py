@@ -17,9 +17,15 @@ class ExpertProfileAdmin(admin.ModelAdmin):
     list_filter = ['created_date']
     search_fields = ['username']
 
+class ChattingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'sender', 'receiver', 'sent_at']
+    search_fields = ['sender', 'receiver']
+    list_filter = ['sent_at']
+
 admin.site.site_header = "Hệ thống quản lý sức khỏe cá nhân"
 
 admin.site.register(User, UserAdmin)
 admin.site.register(ClientProfile, ClientProfileAdmin)
 admin.site.register(ExpertProfile, ExpertProfileAdmin)
 admin.site.register(ExpertClientAssignment)
+admin.site.register(Chatting, ChattingAdmin)

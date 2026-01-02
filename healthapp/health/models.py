@@ -54,3 +54,7 @@ class Reminder(models.Model):
     def __str__(self):
         return self.message
 
+    def set_done(self):
+        self.is_done = True
+        self.save()
+

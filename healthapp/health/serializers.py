@@ -50,7 +50,7 @@ class HealthDiarySerializer(ModelSerializer):
         if request and request.user != instance.user:
             raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER!"})
 
-        allowed_fields = {"content"}
+        allowed_fields = {"content", "workout_plan"}
         if set(validated_data.keys()) - allowed_fields:
             raise ValidationError({"error": "ONLY CONTENT CAN BE UPDATED"})
 
