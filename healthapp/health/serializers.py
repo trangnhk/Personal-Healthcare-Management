@@ -68,6 +68,11 @@ class ReminderSerializer(ModelSerializer):
         ]
         read_only_fields = ["id", "is_done"]
 
+    def validate_remind_at(self, value):
+        if value < timezone.now():
+            raise ValidationError("REMIND TIME MUST BE IN THE FUTURE")
+        return value
+
     def create(self, validated_data):
         request = self.context.get("request")
         user = request.user
@@ -78,14 +83,10 @@ class ReminderSerializer(ModelSerializer):
         return Reminder.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        request = self.context.get("request")
-        user = request.user
-
-        if user != instance.user:
-            raise ValidationError({"error": "YOU CANNOT UPDATE THIS REMINDER"})
 
         allowed_fields = {"message", "remind_at", "workout_plan"}
         if set(validated_data.keys()) - allowed_fields:
             raise ValidationError({"error": "THIS FIELD CANNOT BE UPDATED"})
 
         return super().update(instance, validated_data)
+

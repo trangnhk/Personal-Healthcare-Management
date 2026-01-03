@@ -5,11 +5,16 @@ from accounts.models import UserRole
 
 
 class Exercise(models.Model):
+    # expert/client create exercise
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_exercises")
+
     name = models.CharField(max_length=200)
     calories_per_minute = models.FloatField(default=0)
     muscle_group = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
+
+    is_public = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -28,7 +33,7 @@ class WorkoutPlan(models.Model):
 
 class WorkoutPlanExercise(models.Model):
     workout_plan = models.ForeignKey(WorkoutPlan, on_delete=models.CASCADE, related_name="plan_exercises")
-    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, related_name="exercise_plans")
+    exercise = models.ForeignKey(Exercise, on_delete=models.SET_NULL, null=True, blank=True, related_name="exercise_plans")
 
     duration = models.IntegerField(help_text="Duration in minutes")
     sets = models.IntegerField(default=1)

@@ -46,10 +46,10 @@ class UserSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
-
-        # Not allowed update another user
-        if request and request.user != instance:
-            raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER!"})
+        #
+        # # Not allowed update another user
+        # if request and request.user != instance:
+        #     raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER!"})
 
         # update password
         new_password = validated_data.pop("password", None)
@@ -156,6 +156,82 @@ class ClientDetailSerializer(ModelSerializer):
             "client_profile",
             "experts"
         ]
+
+class ExpertDetailSerializer(ModelSerializer):
+    expert_profile = ExpertProfileSerializer()
+    clients = UserPublicSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "expert_profile",
+            "clients"
+        ]
+
+class CurrentUserSerializer(ModelSerializer):
+    client_profile = ClientProfileSerializer()
+    expert_profile = ExpertProfileSerializer()
+    clients = serializers.SerializerMethodField()
+    experts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "role",
+            "client_profile",
+            "expert_profile",
+            "clients",
+            "experts"
+        ]
+        read_only_fields = ["id", "client_profile", "expert_profile",]
+
+    def get_clients(self, obj):
+        if obj.role != UserRole.EXPERT:
+            return []
+
+        assignments = (
+            ExpertClientAssignment.objects
+            .filter(expert=obj, is_active=True)
+            .select_related("client")
+        )
+
+        clients = [a.client for a in assignments]
+
+        return UserPublicSerializer(clients, many=True).data
+
+    def get_experts(self, obj):
+        if obj.role != UserRole.CLIENT:
+            return []
+
+        assignments = (
+            ExpertClientAssignment.objects
+            .filter(client=obj, is_active=True)
+            .select_related("expert")
+        )
+
+        experts = [a.expert for a in assignments]
+
+        return UserPublicSerializer(experts, many=True).data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        if instance.role == UserRole.CLIENT:
+            data.pop("expert_profile", None)
+            data.pop("clients", None)
+
+        elif instance.role == UserRole.EXPERT:
+            data.pop("client_profile", None)
+            data.pop("experts", None)
+
+        return data
+
 
 class ChattingSerializer(ModelSerializer):
     sender = UserPublicSerializer(read_only=True)

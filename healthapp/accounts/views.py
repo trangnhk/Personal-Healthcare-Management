@@ -4,12 +4,14 @@ from rest_framework.response import Response
 
 from .models import User, UserRole, Chatting
 from .serializers import RegisterSerializer, UserPublicSerializer, ClientDetailSerializer, \
-    UserSerializer, ChattingSerializer
+    UserSerializer, ChattingSerializer, ExpertDetailSerializer, CurrentUserSerializer
+from healthapp import perms
 
-
-class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
+class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    permission_classes = [perms.IsOwner]
+    http_method_names = ["get", "post", "patch", "delete"]
 
     # permission
     def get_permissions(self):
@@ -34,6 +36,8 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
 
         return UserSerializer
 
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -45,21 +49,10 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
 
-    @action(methods=["get", "patch"], detail=False, url_path="current-user", permission_classes=[permissions.IsAuthenticated],)
+    @action(methods=["get"], detail=False, url_path="current-user")
     def current_user(self, request):
-        user = request.user
-
-        if request.method.__eq__("PATCH"):
-            serializer = UserSerializer(
-                user,
-                data=request.data,
-                partial=True,
-                context={"request": request},
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-
-        return Response(UserSerializer(user).data,status=status.HTTP_200_OK)
+        serializer = CurrentUserSerializer(request.user)
+        return Response(serializer.data)
 
     @action(methods=["get"], detail=False, url_path="experts", permission_classes=[permissions.AllowAny])
     def experts(self, request):
@@ -68,15 +61,6 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
         serializer = UserPublicSerializer(experts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(methods=["get"], detail=True, url_path="client-detail", permission_classes=[permissions.IsAuthenticated])
-    def client_detail(self, request, pk=None):
-        try:
-            client = User.objects.get(pk=pk, role=UserRole.CLIENT)
-        except User.DoesNotExist:
-            return Response({"error": "CLIENT NOT FOUND"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = ClientDetailSerializer(client)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]

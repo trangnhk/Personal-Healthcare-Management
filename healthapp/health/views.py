@@ -11,11 +11,13 @@ from .serializers import HealthMetricSerializer, HealthDiarySerializer, Reminder
 from .models import HealthMetric, HealthDiary, Reminder
 from workouts.models import WorkoutPlan
 
+from healthapp import perms
+
 
 class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView,
                           generics.UpdateAPIView):
     serializer_class = HealthMetricSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [perms.IsOwner]
     http_method_names = ["get", "post", "patch", "delete"]
 
     def get_queryset(self):
@@ -31,20 +33,20 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
 
         return Response(self.get_serializer(metric).data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
-        metric = self.get_object()
-
-        if metric.user != request.user:
-            return ValidationError({"error": "YOU CANNOT UPDATE THIS METRIC"})
-
-        return super().update(request, *args, **kwargs)
+    # def update(self, request, *args, **kwargs):
+    #     metric = self.get_object()
+    #
+    #     if metric.user != request.user:
+    #         return ValidationError({"error": "YOU CANNOT UPDATE THIS METRIC"})
+    #
+    #     return super().update(request, *args, **kwargs)
 
     @action(methods=["post"], detail=True, url_path="soft_delete")
     def soft_delete(self, request):
         metric = self.get_object()
 
-        if metric.user != request.user:
-            return ValidationError({"error": "YOU CANNOT DELETE THIS METRIC"})
+        # if metric.user != request.user:
+        #     return ValidationError({"error": "YOU CANNOT DELETE THIS METRIC"})
 
         metric.soft_delete()
 
@@ -73,7 +75,7 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
 
 class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
     serializer_class = HealthDiarySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [perms.IsOwner]
     http_method_names = ["get", "post", "patch", "delete"]
 
     def get_queryset(self):
@@ -88,23 +90,21 @@ class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.List
         diary = serializer.save()
 
         return Response(self.get_serializer(diary).data, status=status.HTTP_201_CREATED)
+    #
+    # def destroy(self, request, *args, **kwargs):
+    #     diary = self.get_object()
+    #
+    #
+    #     diary.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def destroy(self, request, *args, **kwargs):
-        diary = self.get_object()
-
-        if diary.user != request.user:
-            raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER'S DIARY"})
-
-        diary.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def update(self, request, *args, **kwargs):
-        diary = self.get_object()
-
-        if diary.user != request.user:
-            raise ValidationError({"error": "YOU CANNOT UPDATE THIS DIARY"})
-
-        return super().update(request, *args, **kwargs)
+    # def update(self, request, *args, **kwargs):
+    #     diary = self.get_object()
+    #
+    #     if diary.user != request.user:
+    #         raise ValidationError({"error": "YOU CANNOT UPDATE THIS DIARY"})
+    #
+    #     return super().update(request, *args, **kwargs)
 
     @action(methods=["get"], detail=False, url_path="by-date")
     def get_diary_by_date(self, request):
@@ -155,10 +155,15 @@ class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.List
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.UpdateAPIView):
+class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
     serializer_class = ReminderSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ["get", "post", "patch"]
+    permission_classes = [perms.IsOwner]
+    http_method_names = ["get", "post", "patch", "delete"]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return Reminder.objects.filter(user=user).select_related("workout_plan").order_by("remind_at")
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={"request": request})
@@ -168,14 +173,17 @@ class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
 
         return Response(self.get_serializer(reminder).data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
-        pass
-
-    def list(self, request, *args, **kwargs):
-        pass
 
     @action(methods=["post"], detail=True, url_path="set_done")
-    def set_done_reminder(self, request):
-        pass
+    def set_done_reminder(self, request, pk=None):
+        reminder = self.get_object()
+
+        if reminder.is_done:
+            return Response({"message": "REMINDER HAS ALREADY DONE"}, status=status.HTTP_400_BAD_REQUEST)
+
+        reminder.set_done()
+
+        return Response({"message": "THIS REMINDER IS SET DONE"}, status=status.HTTP_200_OK)
+
 
 
