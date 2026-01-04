@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from accounts.models import UserRole
+from rest_framework.exceptions import ValidationError
 from workouts.models import WorkoutPlan
 from ckeditor.fields import RichTextField
 from django.utils import timezone
@@ -57,4 +58,12 @@ class Reminder(models.Model):
     def set_done(self):
         self.is_done = True
         self.save()
+
+    def clean(self):
+        if self.user.role != UserRole.CLIENT:
+            raise ValidationError("ONLY CLIENT CAN CREATE REMINDER")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
