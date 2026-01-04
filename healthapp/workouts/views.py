@@ -8,6 +8,7 @@ from .serializers import ExerciseSerializer, WorkoutPlanExerciseSerializer, Work
 from .models import Exercise, WorkoutPlanExercise, WorkoutPlan
 
 from healthapp import perms
+from .perms import IsWorkoutPlanCreator
 
 class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
     # queryset = Exercise.object.filter(is_public=True)
@@ -39,7 +40,26 @@ class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
         return Response(self.get_serializer(exercise).data, status=status.HTTP_201_CREATED)
 
 class WorkoutPlanViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.UpdateAPIView):
-    serializer_class = WorkoutPlan
-    permission_classes = [perms.IsOwner]
+    serializer_class = WorkoutPlanSerializer
+    # permission_classes = [perms.IsOwner, IsCreator]
+    http_method_names = ["get", "post", "patch"]
+
+    def get_permissions(self):
+        if self.action == "partial_update":
+            return [IsWorkoutPlanCreator()]
+        return [perms.IsOwner()]
+    def get_queryset(self):
+        user = self.request.user
+
+        return WorkoutPlan.objects.filter(Q(user=user) | Q(expert=user)).order_by("-created_date")
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        workout_plan = serializer.save()
+
+        return Response(self.get_serializer(workout_plan).data, status=status.HTTP_201_CREATED)
+
 
 
