@@ -10,15 +10,15 @@ from healthapp import perms
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
-    permission_classes = [perms.IsOwner]
-    http_method_names = ["get", "post", "patch", "delete"]
+    # permission_classes = [perms.IsOwner]
+    http_method_names = ["get", "post", "patch"]
 
     # permission
     def get_permissions(self):
-        if self.action.__eq__("create"):
+        if self.action in ["create", "experts"]:
             return [permissions.AllowAny()]
 
-        if self.action in ["current_user", "experts", "client_detail"]:
+        if self.action in ["current_user", "partial_update"]:
             return  [permissions.IsAuthenticated()]
 
         return [permissions.IsAdminUser()]
@@ -30,9 +30,6 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
 
         if self.action.__eq__("experts"):
             return UserPublicSerializer
-
-        if self.action.__eq__("client_detail"):
-            return ClientDetailSerializer
 
         return UserSerializer
 
@@ -52,7 +49,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
     @action(methods=["get"], detail=False, url_path="current-user")
     def current_user(self, request):
         serializer = CurrentUserSerializer(request.user)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["get"], detail=False, url_path="experts", permission_classes=[permissions.AllowAny])
     def experts(self, request):
@@ -63,7 +60,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
 
 
 class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [perms.IsOwner]
     serializer_class = ChattingSerializer
 
     def list(self, request, *args, **kwargs):

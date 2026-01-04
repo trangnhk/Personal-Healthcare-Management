@@ -110,9 +110,16 @@ class ClientProfileSerializer(ModelSerializer):
             "health_goal",
             "bmi",
         ]
+        read_only_fields = ["id", "user"]
 
     def get_bmi(self, obj):
         return obj.bmi()
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        user = request.user
+
+        return ClientProfile.objects.create(user=user, **validated_data)
 
 class ExpertProfileSerializer(ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)

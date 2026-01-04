@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import  AbstractUser
 from cloudinary.models import CloudinaryField
+from rest_framework.exceptions import ValidationError
+
 
 # USER
 class Gender(models.TextChoices):
@@ -76,6 +78,14 @@ class ClientProfile(models.Model):
     def bmi(self):
         return round(self.weight / ((self.height / 100) ** 2), 2)
 
+    def clean(self):
+        if self.user.role != UserRole.CLIENT:
+            raise ValidationError("ONLY CLIENT CAN CREATE CLIENT PROFILE")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 class ExpertProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='expert_profile')
@@ -89,6 +99,14 @@ class ExpertProfile(models.Model):
 
     def __str__(self):
         return f"Expert: {self.user.get_full_name()} profile"
+
+    def clean(self):
+        if self.user.role != UserRole.EXPERT:
+            raise ValidationError("ONLY EXPERT CAN CREATE EXPERT PROFILE")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class Chatting (models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
