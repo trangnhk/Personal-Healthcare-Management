@@ -41,8 +41,8 @@ class UserSerializer(ModelSerializer):
         data = super().to_representation(instance)
         if instance.avatar:
             data["avatar"] = instance.avatar.url
-
         return data
+
 
     def update(self, instance, validated_data):
         request = self.context.get("request")

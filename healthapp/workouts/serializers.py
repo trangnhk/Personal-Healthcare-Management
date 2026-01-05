@@ -28,8 +28,8 @@ class ExerciseSerializer(ModelSerializer):
         return Exercise.objects.create(created_by=user, **validated_data)
 
     def update(self, instance, validated_data):
-        request = self.context.get("request")
-        user = request.user
+        # request = self.context.get("request")
+        # user = request.user
 
         # if instance.created_by != user:
         #     raise ValidationError({"error": "YOU CAN ONLY UPDATE YOUR OWN EXERCISE"})
@@ -87,7 +87,7 @@ class WorkoutPlanExerciseSerializer(ModelSerializer):
 
     exercise_id = serializers.PrimaryKeyRelatedField(
         queryset=Exercise.objects.all(),
-        source=exercise
+        source="exercise"
     )
     class Meta:
         model = WorkoutPlanExercise
@@ -108,6 +108,28 @@ class WorkoutPlanExerciseSerializer(ModelSerializer):
             }
         }
 
+    def validate_exercise_id(self, exercise):
+        request = self.context["request"]
+        workout_plan = self.context["workout_plan"]
+        user = request.user
+
+        # Exercise PUBLIC
+        if exercise.is_public:
+            return exercise
+
+        # Exercise created by CURRENT USER
+        if exercise.created_by == user:
+            return exercise
+
+
+        if (
+                workout_plan.expert
+                and exercise.created_by == workout_plan.expert
+                and user == workout_plan.user
+        ):
+            return exercise
+
+        raise ValidationError("YOU DO NOT HAVE PERMISSION TO USE THIS EXERCISE")
     def create(self, validated_data):
         request = self.context.get("request")
         workout_plan = self.context.get("workout_plan")

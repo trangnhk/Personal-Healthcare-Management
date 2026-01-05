@@ -26,8 +26,7 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
-    avatar = CloudinaryField(null=True, blank=True)
-
+    avatar = CloudinaryField('avatar', null=True, blank=True)
     # client - expert: ManyToMany
     experts = models.ManyToManyField('self',
                                      through="ExpertClientAssignment",

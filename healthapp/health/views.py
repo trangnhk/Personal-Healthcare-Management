@@ -25,13 +25,13 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
 
         return HealthMetric.objects.filter(user=user, is_deleted=False).select_related("workout_plan").order_by("-recorded_at")
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-
-        metric = serializer.save()
-
-        return Response(self.get_serializer(metric).data, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, context={"request": request})
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     metric = serializer.save()
+    #
+    #     return Response(self.get_serializer(metric).data, status=status.HTTP_201_CREATED)
 
     # def update(self, request, *args, **kwargs):
     #     metric = self.get_object()
@@ -83,13 +83,13 @@ class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.List
 
         return HealthDiary.objects.filter(user=user).select_related("workout_plan").order_by("-created_date")
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-
-        diary = serializer.save()
-
-        return Response(self.get_serializer(diary).data, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, context={"request": request})
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     diary = serializer.save()
+    #
+    #     return Response(self.get_serializer(diary).data, status=status.HTTP_201_CREATED)
     #
     # def destroy(self, request, *args, **kwargs):
     #     diary = self.get_object()
@@ -165,13 +165,13 @@ class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
 
         return Reminder.objects.filter(user=user).select_related("workout_plan").order_by("remind_at")
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-
-        reminder = serializer.save()
-
-        return Response(self.get_serializer(reminder).data, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, context={"request": request})
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     reminder = serializer.save()
+    #
+    #     return Response(self.get_serializer(reminder).data, status=status.HTTP_201_CREATED)
 
 
     @action(methods=["post"], detail=True, url_path="set_done")

@@ -2,24 +2,31 @@ from django.db.models import Q
 from rest_framework import viewsets, generics, status, parsers, permissions
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from .serializers import ExerciseSerializer, WorkoutPlanExerciseSerializer, WorkoutPlanSerializer
 from .models import Exercise, WorkoutPlanExercise, WorkoutPlan
 
 from healthapp import perms
-from .perms import IsWorkoutPlanCreator
+from .perms import IsWorkoutPlanCreator, IsExerciseCreator, IsWorkoutPlanMember
+# IsWorkoutPlanExerciseCreator
+from .paginators import ExerciseCursorPagination, WorkoutPlanCursoPagination
+
 
 class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
     # queryset = Exercise.object.filter(is_public=True)
     serializer_class = ExerciseSerializer
     # permission_classes = [perms.IsOwner]
     http_method_names = ["get", "post", "patch", "delete"]
+    pagination_class = ExerciseCursorPagination
 
     def get_permissions(self):
         if self.action == "list":
             return [permissions.AllowAny()]
-        return [perms.IsOwner()]
+        if self.action in ["partial_update", "destroy"]:
+            return [IsExerciseCreator]
+        return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
         user = self.request.user
@@ -31,35 +38,57 @@ class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
 
         return Exercise.objects.filter(is_public=True).order_by("-created_date")
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
-
-        exercise = serializer.save()
-
-        return Response(self.get_serializer(exercise).data, status=status.HTTP_201_CREATED)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, context={"request": request})
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     exercise = serializer.save()
+    #
+    #     return Response(self.get_serializer(exercise).data, status=status.HTTP_201_CREATED)
 
 class WorkoutPlanViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.UpdateAPIView):
     serializer_class = WorkoutPlanSerializer
     # permission_classes = [perms.IsOwner, IsCreator]
     http_method_names = ["get", "post", "patch"]
+    pagination_class = WorkoutPlanCursoPagination
 
     def get_permissions(self):
         if self.action == "partial_update":
             return [IsWorkoutPlanCreator()]
-        return [perms.IsOwner()]
+        return [permissions.IsAuthenticated()]
     def get_queryset(self):
         user = self.request.user
 
         return WorkoutPlan.objects.filter(Q(user=user) | Q(expert=user)).order_by("-created_date")
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"request": request})
-        serializer.is_valid(raise_exception=True)
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data, context={"request": request})
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     workout_plan = serializer.save()
+    #
+    #     return Response(self.get_serializer(workout_plan).data, status=status.HTTP_201_CREATED)
 
-        workout_plan = serializer.save()
+class WorkoutPlanExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
+    serializer_class = WorkoutPlanExerciseSerializer
+    http_method_names = ["get", "post"]
+    permission_classes = [IsWorkoutPlanMember]
 
-        return Response(self.get_serializer(workout_plan).data, status=status.HTTP_201_CREATED)
+    def get_workout_plan(self):
+        return get_object_or_404(WorkoutPlan, pk=self.kwargs["workout_plan_pk"])
+
+    def get_queryset(self):
+        plan = self.get_workout_plan()
+        return WorkoutPlanExercise.objects.filter(workout_plan=plan)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["workout_plan"] = self.get_workout_plan()
+        return context
+
+    def list(self, request, *args, **kwargs):
+        print(self.kwargs)
+        return super().list(request, *args, **kwargs)
 
 
 

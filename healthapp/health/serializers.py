@@ -32,10 +32,21 @@ class HealthDiarySerializer(ModelSerializer):
             "id",
             "content",
             "workout_plan",
-            "created_date"
+            "created_date",
+            "image"
         ]
 
         read_only_fields = ["id", "created_date"]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.image:
+            data["image"] = instance.image.url
+
+        return data
+
+
+
 
     def create(self, validated_data):
         request = self.context.get("request")

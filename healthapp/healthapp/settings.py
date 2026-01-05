@@ -14,6 +14,9 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA_URL = '/media/'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -45,12 +48,15 @@ INSTALLED_APPS = [
     'drf_yasg',
     'ckeditor_uploader',
     'cloudinary',
+    # 'cloudinary_storage',
     'rest_framework',
     'oauth2_provider',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('oauth2_provider.contrib.rest_framework.OAuth2Authentication',)
+    'DEFAULT_AUTHENTICATION_CLASSES': ('oauth2_provider.contrib.rest_framework.OAuth2Authentication',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination',
+    'PAGE_SIZE': 5,
 }
 
 import cloudinary
@@ -60,6 +66,15 @@ cloudinary.config(
     api_key='771652583444831',
     api_secret='EwZYOpA4n19unyDcRFEDBud6LBA'
 )
+
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+#
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': 'dxfbpkmen',
+#     'API_KEY': '771652583444831',
+#     'API_SECRET': 'EwZYOpA4n19unyDcRFEDBud6LBA',
+# }
+
 
 CKEDITOR_UPLOAD_PATH = "images/ckeditors/"
 
@@ -153,5 +168,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CLIENT_ID = 'IdTp5paUfJIpo1YGID4cmUOJoqn0ww7v8XeuV4qb'
 CLIENT_SECRET = 'gPO3TVVHZpXKarmhK46ZugN9Hh2yJJ0pTVM5OqpVic5obpYIqjbHN2Udal08XPvrlppK5B4Bspw5S8SuqCah1F2BWvlVZ2xAN86nKRSoVBCHIkFxEFuXpHlbelCYtCKX'
-
-

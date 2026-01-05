@@ -6,6 +6,7 @@ from .models import User, UserRole, Chatting
 from .serializers import RegisterSerializer, UserPublicSerializer, ClientDetailSerializer, \
     UserSerializer, ChattingSerializer, ExpertDetailSerializer, CurrentUserSerializer
 from healthapp import perms
+from .paginators import ChattingCursorPagination
 
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
@@ -62,6 +63,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
 class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView):
     permission_classes = [perms.IsOwner]
     serializer_class = ChattingSerializer
+    pagination_class = ChattingCursorPagination
 
     def list(self, request, *args, **kwargs):
         user = request.user

@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.db import models
 from django.conf import settings
 from accounts.models import UserRole
@@ -40,7 +41,8 @@ class HealthDiary(models.Model):
 
     content = RichTextField()
     created_date = models.DateTimeField(auto_now_add=True)
-
+    image = CloudinaryField('image',null=True)
+    # image = models.ImageField(upload_to="health/", blank=True, null=True)
     def __str__(self):
         return f"{self.user.username} - {self.created_date}"
 
