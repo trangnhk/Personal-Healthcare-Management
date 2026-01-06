@@ -18,7 +18,7 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
                           generics.UpdateAPIView):
     serializer_class = HealthMetricSerializer
     permission_classes = [perms.IsOwner]
-    http_method_names = ["get", "post", "patch", "delete"]
+    http_method_names = ["get", "post", "patch"]
 
     def get_queryset(self):
         user = self.request.user

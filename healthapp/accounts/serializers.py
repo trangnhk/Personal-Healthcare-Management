@@ -119,6 +119,12 @@ class ClientProfileSerializer(ModelSerializer):
         request = self.context.get("request")
         user = request.user
 
+        if user.role != UserRole.CLIENT:
+            raise ValidationError({"error": "ONLY CLIENT CAN CREATE CLIENT PROFILE"})
+
+        if ClientProfile.objects.filter(user=user).exists():
+            raise ValidationError({"error": "CLIENT PROFILE ALREADY EXISTS"})
+
         return ClientProfile.objects.create(user=user, **validated_data)
 
 class ExpertProfileSerializer(ModelSerializer):
@@ -134,6 +140,19 @@ class ExpertProfileSerializer(ModelSerializer):
             "bio"
         ]
         read_only_fields = ["rating"]
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        user = request.user
+
+        if user.role != UserRole.EXPERT:
+            raise ValidationError({"error": "ONLY EXPERT CAN CREATE EXPERT PROFILE"})
+
+        if ExpertProfile.objects.filter(user=user).exists():
+            raise ValidationError({"error": "EXPERT PROFILE ALREADY EXISTS"})
+
+        return ExpertProfile.objects.create(user=user, **validated_data)
+
 
 class ExpertClientSerializer(ModelSerializer):
     expert = serializers.StringRelatedField()
@@ -266,6 +285,9 @@ class ChattingSerializer(ModelSerializer):
             receiver = User.objects.get(id=receiver_id)
         except User.DoesNotExist:
             raise ValidationError({"receiver_id": "INVALID USER"})
+
+        if receiver == request.user:
+            raise ValidationError({"error": "CANNOT CHAT WITH YOURSELF"})
 
         return Chatting.objects.create(sender=request.user, receiver=receiver, content=validated_data['content'])
 

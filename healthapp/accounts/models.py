@@ -36,16 +36,6 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.set_password(self.password)
-        else:
-            old = User.objects.get(pk=self.pk)
-            if old.password != self.password:
-                self.set_password(self.password)
-
-        super().save(*args, **kwargs)
-
 class ExpertClientAssignment(models.Model):
     expert = models.ForeignKey(User, on_delete=models.CASCADE, related_name="expert_assignment",
                                limit_choices_to={'role': UserRole.EXPERT})

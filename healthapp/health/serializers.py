@@ -80,7 +80,7 @@ class ReminderSerializer(ModelSerializer):
         read_only_fields = ["id", "is_done"]
 
     def validate_remind_at(self, value):
-        if value < timezone.now() and value.__eq__(timezone.now()):
+        if value <= timezone.now():
             raise ValidationError("REMIND TIME MUST BE IN THE FUTURE")
         return value
 
