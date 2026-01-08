@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import viewsets, generics, status, parsers, permissions
+from rest_framework import viewsets, generics, status, parsers, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
@@ -14,18 +14,20 @@ from .perms import IsWorkoutPlanCreator, IsExerciseCreator, IsWorkoutPlanMember
 from .paginators import ExerciseCursorPagination, WorkoutPlanCursoPagination
 
 
-class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
+class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView, generics.RetrieveAPIView):
     # queryset = Exercise.object.filter(is_public=True)
     serializer_class = ExerciseSerializer
     # permission_classes = [perms.IsOwner]
     http_method_names = ["get", "post", "patch", "delete"]
     pagination_class = ExerciseCursorPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
     def get_permissions(self):
-        if self.action == "list":
+        if self.action in ["list", "retrieve"]:
             return [permissions.AllowAny()]
         if self.action in ["partial_update", "destroy"]:
-            return [IsExerciseCreator]
+            return [IsExerciseCreator()]
         return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
@@ -36,7 +38,7 @@ class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
                 Q(is_public=True) | Q(created_by=user)
             ).order_by("-created_date")
 
-        return Exercise.objects.filter(is_public=True).order_by("-created_date")
+        return Exercise.objects.filter(is_public=True).order_by("-created_date", "-id")
 
     # def create(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data, context={"request": request})

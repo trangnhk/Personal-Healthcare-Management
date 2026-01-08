@@ -4,21 +4,14 @@ from rest_framework import serializers
 
 from .models import *
 from accounts.models import UserRole
+from accounts.serializers import UserPublicSerializer
 
 
 class ExerciseSerializer(ModelSerializer):
+    created_by = UserPublicSerializer()
     class Meta:
         model = Exercise
-        fields = [
-            "id",
-            "created_by",
-            "name",
-            "calories_per_minute",
-            "muscle_group",
-            "description",
-            "created_date",
-            "is_public"
-        ]
+        fields = '__all__'
         read_only_fields = ["id", "created_date", "created_by"]
 
     def create(self, validated_data):

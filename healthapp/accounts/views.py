@@ -16,7 +16,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
 
     # permission
     def get_permissions(self):
-        if self.action in ["create", "experts"]:
+        if self.action in ["create", "experts", "expert_detail"]:
             return [permissions.AllowAny()]
 
         if self.action in ["current_user", "partial_update"]:
@@ -32,6 +32,9 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
         if self.action.__eq__("experts"):
             return UserPublicSerializer
 
+        if self.action.__eq__("expert_detail"):
+            return ExpertDetailSerializer
+
         return UserSerializer
 
     def get_queryset(self):
@@ -46,19 +49,27 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
             UserPublicSerializer(user).data,
             status=status.HTTP_201_CREATED
         )
-
     @action(methods=["get"], detail=False, url_path="current-user")
     def current_user(self, request):
         serializer = CurrentUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(methods=["get"], detail=False, url_path="experts", permission_classes=[permissions.AllowAny])
+    @action(methods=["get"], detail=False, url_path="experts")
     def experts(self, request):
         experts = User.objects.filter(role=UserRole.EXPERT, is_active=True)
 
         serializer = UserPublicSerializer(experts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=["get"], detail=True, url_path="expert-detail")
+    def expert_detail(self, request, pk=None):
+        try:
+            expert = User.objects.get(pk=pk, role=UserRole.EXPERT, is_active=True)
+        except User.DoesNotExist:
+            return Response({"error": "EXPERT NOT FOUND"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ExpertDetailSerializer(expert)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ChatViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView):
     permission_classes = [perms.IsOwner]
