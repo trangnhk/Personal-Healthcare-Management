@@ -15,8 +15,13 @@ export const getPublicExercises = (search = "", cursor = null) => {
     return publicApi.get(url);
 };
 
-export const getExperts = () =>
-    publicApi.get(endpoints.experts);
+export const getExperts = () => {
+    return publicApi.get(endpoints.experts);
+}
+    
+export const getExpertDetail = (expertId) => {
+    return publicApi.get(endpoints.expertDetail(expertId));
+}
 
 export const getExerciseDetail = (exerciseId) =>{
     return publicApi.get(`/exercises/${exerciseId}/`);

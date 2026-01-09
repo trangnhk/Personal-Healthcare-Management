@@ -17,28 +17,47 @@ export default StyleSheet.create({
         padding: 10
     },
     avatar: {
-        width: 120,
-        height: 120,
-        borderRadius: 50
+        width: 200,
+        height: 200,
+        borderRadius: 100
     }, 
     title: {
-        fontSize: 49,
+        fontSize: 55,
         fontWeight: "bold",
         color: "#298e7aff",
         alignSelf: "center",
-        padding: 25
+        padding: 20
     },
     word:{
-        fontSize: 23,
+        fontSize: 27,
         fontWeight: "bold",
         color: "#16b494ff",
-        padding: 1
+        padding: 5
     },
     note:{
         fontSize: 14,
         color: "#a98a8aff",
         fontStyle: "italic",
-        padding: 3
+        padding: 7
+    },
+    annoucement:{
+        fontSize: 20,
+        color: "#ff4500ff",
+        alignSelf: "center",
+        fontStyle: "italic",
+        padding: 10,
+    },
+    button:{
+        marginRight: 10, 
+        paddingVertical: 12, 
+        paddingHorizontal: 18, 
+        backgroundColor: "#188d66ff", 
+        borderRadius: 8,
+    },
+    textButton:{
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 16,
     }
 }
 );
