@@ -14,6 +14,13 @@ class ExerciseSerializer(ModelSerializer):
         fields = '__all__'
         read_only_fields = ["id", "created_date", "created_by"]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.image:
+            data["image"] = instance.image.url
+
+        return data
+
     def create(self, validated_data):
         request = self.context.get("request")
         user = request.user

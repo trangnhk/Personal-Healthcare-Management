@@ -35,17 +35,17 @@ class Command(BaseCommand):
         self.stdout.write("👤 Creating users...")
 
         users = [
-            ("expert_a", "a@gmail.com", UserRole.EXPERT),
-            ("expert_b", "b@gmail.com", UserRole.EXPERT),
-            ("client_a", "clienta@gmail.com", UserRole.CLIENT),
-            ("client_b", "clientb@gmail.com", UserRole.CLIENT),
-            ("client_c", "clientc@gmail.com", UserRole.CLIENT),
+            ("expert_a", "a@gmail.com", UserRole.EXPERT, "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767724201/qtjhorrvgixmawngfish.png"),
+            ("expert_b", "b@gmail.com", UserRole.EXPERT, "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767724175/fypjdjcqoc8bdipz06xs.png"),
+            ("client_a", "clienta@gmail.com", UserRole.CLIENT, "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767724233/zpsoy23zoigyw7hkajae.png"),
+            ("client_b", "clientb@gmail.com", UserRole.CLIENT, "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767724261/v7uuu4ok1rrj32v5vjax.png"),
+            ("client_c", "clientc@gmail.com", UserRole.CLIENT, "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767724201/qtjhorrvgixmawngfish.png"),
         ]
 
-        for username, email, role in users:
+        for username, email, role, avatar in users:
             user, created = User.objects.get_or_create(
                 username=username,
-                defaults={"email": email, "role": role}
+                defaults={"email": email, "role": role, "avatar": avatar}
             )
             if created:
                 user.set_password("123")
@@ -131,17 +131,69 @@ class Command(BaseCommand):
         self.stdout.write("Creating exercises...")
 
         public_exercises = [
-            ("Push Up", 8, "Chest"),
-            ("Squat", 9, "Legs"),
-            ("Jumping Jack", 10, "Full Body"),
-            ("Burpee", 12, "Full Body"),
+            # format: (name, calories, muscle_group, description[, image])
+            ("Push Up", 8, "Chest",
+             "Classic push-up to strengthen chest, shoulders, and triceps.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767962997/1-tap-dui-shutterstock-7679_x1bllb.jpg"),
+            ("Wide Push Up", 10, "Chest",
+             "Push-up variation with wide hand placement for chest focus.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963440/download_igggz3.jpg"),
+            ("Incline Push Up", 12, "Chest",
+             "Push-ups with hands on elevated surface to reduce difficulty and target upper chest.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963440/download_igggz3.jpg"),
+
+            ("Squat", 10, "Legs",
+             "Basic squat to strengthen thighs, glutes, and core.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963495/download_ttvogx.png"),
+            ("Jump Squat", 12, "Legs",
+             "Explosive squat jump to build leg power and cardio endurance.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963538/download_1_pwacpz.jpg"),
+            ("Lunges", 10, "Legs",
+             "Step forward into a lunge to work quads, glutes, and balance."),
+
+            ("Plank", 30, "Core",
+             "Hold a stable plank to strengthen the entire core.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963694/low-plank-hold-b8a63da1ef844f00b6f6a21141ba1d87_fch8qu.jpg"),
+            ("Crunch", 15, "Core",
+             "Classic ab crunch to target upper abdominal muscles."),
+            ("Leg Raise", 12, "Core",
+             "Lift legs while lying down to engage lower abs.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963723/maxresdefault_p6cenm.jpg"),
+
+            ("Jumping Jack", 20, "Full Body",
+             "Full-body cardio exercise to increase heart rate and warm up muscles."),
+            ("Burpee", 12, "Full Body",
+             "Combines squat, push-up, and jump for full-body strength and cardio."),
+
+            ("Mountain Climber", 20, "Cardio",
+             "Dynamic plank movement to improve core strength and cardiovascular fitness.",
+             "https://res.cloudinary.com/dxfbpkmen/image/upload/v1767963775/Mountain-Climber-with-Bosu-Ball_jyari9.jpg"),
+            ("High Knees", 25, "Cardio",
+             "Run in place lifting knees high to boost cardio and leg strength."),
+            ("Butt Kicks", 25, "Cardio",
+             "Run in place kicking heels to glutes, improving cardio and hamstring flexibility."),
         ]
 
-        for name, cal, group in public_exercises:
-            Exercise.objects.get_or_create(
-                name=name,
-                defaults={"calories_per_minute": cal, "muscle_group": group, "is_public": True}
-            )
+        for item in public_exercises:
+            # Nếu tuple có 5 phần: name, cal, group, description, image
+            # Nếu tuple có 4 phần: image = None
+            if len(item) == 5:
+                name, cal, group, description, image = item
+            else:
+                name, cal, group, description = item
+                image = None
+
+            defaults = {
+                "calories_per_minute": cal,
+                "muscle_group": group,
+                "is_public": True,
+                "description": description
+            }
+
+            if image is not None:
+                defaults["image"] = image
+
+            Exercise.objects.get_or_create(name=name, defaults=defaults)
 
     def create_workout_plans(self):
         self.stdout.write("Creating workout plans...")

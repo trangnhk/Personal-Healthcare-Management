@@ -1,11 +1,34 @@
 from django.contrib import admin
-
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import *
 
-class UserAdmin(admin.ModelAdmin):
-    list_display = ['id', 'role', 'dob', 'gender', 'avatar']
-    search_fields = ['id', 'role']
-    list_filter = ['role']
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    model = User
+
+    list_display = ['id', 'username', 'email', 'role', 'is_active']
+    search_fields = ['username', 'email']
+    list_filter = ['role', 'is_active']
+
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Thông tin cá nhân', {
+            'fields': ('first_name', 'last_name', 'email', 'dob', 'gender', 'avatar')
+        }),
+        ('Phân quyền', {
+            'fields': ('role', 'is_active', 'is_staff', 'is_superuser')
+        }),
+    )
+
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', 'role'),
+        }),
+    )
+
+    ordering = ['id']
 
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
@@ -37,7 +60,7 @@ class ChattingAdmin(admin.ModelAdmin):
 
 admin.site.site_header = "Hệ thống quản lý sức khỏe cá nhân"
 
-admin.site.register(User, UserAdmin)
+# admin.site.register(User, UserAdmin)
 # admin.site.register(ClientProfile, ClientProfileAdmin)
 # admin.site.register(ExpertProfile, ExpertProfileAdmin)
 admin.site.register(ExpertClientAssignment)

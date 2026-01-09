@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.db import models
 from django.conf import settings
 
@@ -13,6 +14,7 @@ class Exercise(models.Model):
     muscle_group = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
+    image = CloudinaryField('image', null=True, blank=True)
 
     is_public = models.BooleanField(default=True)
 
