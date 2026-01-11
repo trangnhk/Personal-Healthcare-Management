@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import ExerciseSerializer, WorkoutPlanExerciseSerializer, WorkoutPlanSerializer
 from .models import Exercise, WorkoutPlanExercise, WorkoutPlan
@@ -22,6 +23,7 @@ class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
     pagination_class = ExerciseCursorPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -40,13 +42,13 @@ class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
 
         return Exercise.objects.filter(is_public=True).order_by("-created_date", "-id")
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data, context={"request": request})
-    #     serializer.is_valid(raise_exception=True)
-    #
-    #     exercise = serializer.save()
-    #
-    #     return Response(self.get_serializer(exercise).data, status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        exercise = serializer.save()
+
+        return Response(ExerciseSerializer(exercise, context={"request": request}).data, status=status.HTTP_201_CREATED)
 
 class WorkoutPlanViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.UpdateAPIView):
     serializer_class = WorkoutPlanSerializer
@@ -63,13 +65,13 @@ class WorkoutPlanViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Create
 
         return WorkoutPlan.objects.filter(Q(user=user) | Q(expert=user)).order_by("-created_date")
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data, context={"request": request})
-    #     serializer.is_valid(raise_exception=True)
-    #
-    #     workout_plan = serializer.save()
-    #
-    #     return Response(self.get_serializer(workout_plan).data, status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        workout_plan = serializer.save()
+
+        return Response(WorkoutPlanSerializer(workout_plan).data, status=status.HTTP_201_CREATED)
 
 class WorkoutPlanExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     serializer_class = WorkoutPlanExerciseSerializer

@@ -8,24 +8,24 @@ from accounts.serializers import UserPublicSerializer
 
 
 class ExerciseSerializer(ModelSerializer):
-    created_by = UserPublicSerializer()
+    created_by = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         model = Exercise
-        fields = '__all__'
-        read_only_fields = ["id", "created_date", "created_by"]
+        fields = "__all__"
+        read_only_fields = ["id", "created_date"]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        data["created_by"] = (
+            UserPublicSerializer(instance.created_by).data
+            if instance.created_by else None
+        )
         if instance.image:
             data["image"] = instance.image.url
-
         return data
-
-    def create(self, validated_data):
-        request = self.context.get("request")
-        user = request.user
-
-        return Exercise.objects.create(created_by=user, **validated_data)
 
     def update(self, instance, validated_data):
         # request = self.context.get("request")

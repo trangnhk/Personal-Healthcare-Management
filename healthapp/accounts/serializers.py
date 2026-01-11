@@ -208,6 +208,12 @@ class CurrentUserSerializer(ModelSerializer):
         fields = [
             "id",
             "username",
+            "first_name",
+            "last_name",
+            "password",
+            "dob",
+            "gender",
+            "avatar",
             "email",
             "role",
             "client_profile",

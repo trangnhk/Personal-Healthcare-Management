@@ -11,13 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+from django.core.files.storage import FileSystemStorage
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# MEDIA_ROOT = BASE_DIR / 'media'
-# MEDIA_URL = '/media/'
 
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+MEDIA_ROOT = BASE_DIR / 'static' / 'uploads'  # project/static/uploads
+MEDIA_URL = '/static/uploads/'  # URL truy cập
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -39,9 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'healthapp',
-    # 'accounts.apps.AccountsConfig',
-    # 'workouts.apps.WorkoutsConfig',
-    # 'health.apps.HealthConfig',
     'accounts',
     'health',
     'workouts',
@@ -49,7 +47,6 @@ INSTALLED_APPS = [
     'drf_yasg',
     'ckeditor_uploader',
     'cloudinary',
-    # 'cloudinary_storage',
     'rest_framework',
     'oauth2_provider',
 ]
@@ -60,21 +57,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
 }
 
-import cloudinary
+import cloudinary.api
 
 cloudinary.config(
     cloud_name='dxfbpkmen',
     api_key='771652583444831',
     api_secret='EwZYOpA4n19unyDcRFEDBud6LBA'
 )
-
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-#
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': 'dxfbpkmen',
-#     'API_KEY': '771652583444831',
-#     'API_SECRET': 'EwZYOpA4n19unyDcRFEDBud6LBA',
-# }
 
 
 CKEDITOR_UPLOAD_PATH = "images/ckeditors/"

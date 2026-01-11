@@ -21,6 +21,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+
 from . import settings
 
 schema_view = get_schema_view(
@@ -53,3 +54,5 @@ urlpatterns = [
     path('o/', include('oauth2_provider.urls',
                        namespace='oauth2_provider')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
