@@ -7,7 +7,7 @@ import { authApi } from "../../services/Apis";
 import { endpoints } from "../../services/Endpoints";
 import { HelperText, TextInput } from "react-native-paper";
 import MyStyles from "../../styles/MyStyles";
-import { login } from "../../services/Auth.Services";
+import { login } from "../../services/auth.services";
 
 const LoginTab = ({route}) => {
   const info = [{
@@ -42,8 +42,8 @@ const LoginTab = ({route}) => {
       let res = await login({
         username: user.username,
         password: user.password,
-        'client_id': '2DQGxmgSs5UdMJ796tIZbTOq4aFLrWuED0v7vpTc',
-        'client_secret': '3FqViE6Hh0qICpiECsZMDN3VOYLVZKIr5RA8ucSs4YVPbANn2X0b6GHbragkt6YqtAT6toDRrQhEH6HB258VvGhq2NCS5byzd7noQD2eQpJK1qKMMDljanFefBpsEyH8',
+        'client_id': '33AHLaR7dO2TAqA1cJquSOsqZmil1GmUMiRRqkII',
+        'client_secret': 'idoWa1GLLld2rvoFzVzVleLBUgGp6Qp9A3qi3y38Nf6Ow6uYON2PYKUCLlO9AJTIqVBD8p2hdb1MeljHbW7HHW2iv3FwzRIqcgTfM67wJ6ukaAbJj7XAVC6cK2HcnAyY',
       });
       console.info(res.data);
 
@@ -73,7 +73,7 @@ const LoginTab = ({route}) => {
     }
     
   };
-
+  
 
 
   return (

@@ -16,9 +16,14 @@ export default StyleSheet.create({
     padding: {
         padding: 10
     },
+    image: {
+        width: 100, 
+        height: 100,
+        borderRadius: 25
+    }, 
     avatar: {
-        width: 200,
-        height: 200,
+        width: 300, 
+        height: 300,
         borderRadius: 100
     }, 
     title: {
@@ -48,7 +53,7 @@ export default StyleSheet.create({
         padding: 10,
     },
     button:{
-        marginRight: 10, 
+        margin: 10, 
         paddingVertical: 12, 
         paddingHorizontal: 18, 
         backgroundColor: "#188d66ff", 
@@ -58,6 +63,11 @@ export default StyleSheet.create({
         color: "white",
         fontWeight: "bold",
         fontSize: 16,
+        alignSelf: "center"
+    },
+    text: {
+        fontSize: 20,
+        // margin: 20
     }
 }
 );

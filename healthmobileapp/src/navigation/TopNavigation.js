@@ -6,11 +6,17 @@ import { useContext } from 'react';
 import { MyUserContext } from '../utils/contexts';
 import RegisterTab from '../screens/User/Register';
 import AccountTab from '../screens/User/Account';
+import WorkoutTab from '../components/WorkoutPlan';
+import AccountExpertTab from '../screens/User/AccountExpert';
+
+
 
 const Tab = createMaterialTopTabNavigator();
 
 const MainTopTabNavigator = () => {
     const [user, ] = useContext(MyUserContext);
+    // console.log("TOP TAB USER:", user);
+
     return (
         <Tab.Navigator style={{ marginTop: 30 }}>
         <Tab.Screen
@@ -22,20 +28,36 @@ const MainTopTabNavigator = () => {
             <Tab.Screen
                 name="RegisterTab"
                 component={RegisterTab}
-                options={{ title: "Đăng ký" , tabBarIcon: () => <Icon source="account" size={35} color="#13785aff"/>}}
+                options={{ title: "Đăng ký" , tabBarIcon: () => <Icon source="account-plus" size={35} color="#13785aff"/>}}
             />
             <Tab.Screen
                 name="LoginTab"
                 component={LoginTab}
-                options={{ title: "Đăng nhập" , tabBarIcon: () => <Icon source="account" size={35} color="#13785aff"/>}}
+                options={{ title: "Đăng nhập" , tabBarIcon: () => <Icon source="login" size={35} color="#13785aff"/>}}
             />
         </> : 
-        <>
+        <>  
             <Tab.Screen
+                name="WorkoutTab"
+                component={WorkoutTab}
+                options={{ title: "Kế hoạch tập luyện" , tabBarIcon: () => <Icon source="notebook-multiple" size={35} color="#13785aff"/>}}
+            />
+            {user.role === "client" ? <>
+                <Tab.Screen
                 name="AccountTab"
                 component={AccountTab}
                 options={{ title: "Tài khoản" , tabBarIcon: () => <Icon source="account" size={35} color="#13785aff"/>}}
-            />
+                />
+            </> :
+            <>
+                <Tab.Screen
+                name="AccountExpertTab"
+                component={AccountExpertTab}
+                options={{ title: "Tài khoản" , tabBarIcon: () => <Icon source="account" size={35} color="#13785aff"/>}}
+                />
+            </>}
+            
+            
         </>}
         
         </Tab.Navigator>

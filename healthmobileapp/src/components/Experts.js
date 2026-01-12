@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getExpertDetail, getExperts } from "../services/home.services";
 import { View, Text, Image, ScrollView, FlatList, Touchable, TouchableOpacity } from "react-native";
 import MyStyles from "../styles/MyStyles";
@@ -6,6 +6,7 @@ import { ActivityIndicator, Button, List, Modal, PaperProvider, Portal } from "r
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { endpoints } from "../services/Endpoints";
+import { MyUserContext } from "../utils/contexts";
 
 const Experts = () => {
     const [experts, setExperts] = useState([]);
@@ -13,6 +14,7 @@ const Experts = () => {
     const [visible, setVisible] = useState(false);
     const [selectedExpert, setSelectedExpert] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
+    const [user, dispatch] = useContext(MyUserContext);
 
     const nav = useNavigation();
 
@@ -72,7 +74,7 @@ const Experts = () => {
                         return (
                             <Image
                                 source={{ uri: item.avatar }}
-                                style={{ width: 100, height: 100, borderRadius: 25 }}
+                                style={MyStyles.image}
                             />
                         );
                     return <MaterialIcons name="account-circle" size={100} color="#16b494ff" />;
@@ -111,7 +113,7 @@ const Experts = () => {
                                     ) : (
                                         <MaterialIcons name="account-circle" size={200} color="#16b494ff" />
                                     )}
-                                    <View style={{ marginLeft: 20 }} >
+                                    <View style={MyStyles.padding}>
                                         <Text style={MyStyles.title}>{selectedExpert.username}</Text>
                                         <Text style={{fontSize: 17}}>Họ: {selectedExpert.last_name || "-"}</Text>
                                         <Text style={{fontSize: 17}}>Tên: {selectedExpert.first_name || "-"}</Text>
@@ -125,9 +127,12 @@ const Experts = () => {
                                     </View>
                                     
                                 </View>
-                                <TouchableOpacity>
-                                    <Text style={MyStyles.annoucement} fontWeight="bold">Đăng nhập để kết nối với chuyên gia (Click tại đây)</Text>
-                                </TouchableOpacity>
+                                
+                                {!user && (
+                                    <TouchableOpacity>
+                                        <Text style={MyStyles.annoucement} fontWeight="bold">Đăng nhập để kết nối với chuyên gia (Click tại đây)</Text>
+                                    </TouchableOpacity>
+                                )}
                                 <Button mode="contained" onPress={hideModal} style={{ marginTop: 20 }}>Đóng</Button>
                             </View>
                         ) : (
