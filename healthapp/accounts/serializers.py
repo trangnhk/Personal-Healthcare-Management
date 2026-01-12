@@ -74,10 +74,11 @@ class UserSerializer(ModelSerializer):
         return super().update(instance, validated_data)
 
 class RegisterSerializer(ModelSerializer):
+    avatar = serializers.ImageField(required=False)
 
     class Meta:
         model = User
-        fields = ["username", "password", "email", "role"]
+        fields = ["username", "password", "email", "role", "avatar"]
         extra_kwargs = {
             'password': {
                 'write_only': True
@@ -85,12 +86,18 @@ class RegisterSerializer(ModelSerializer):
         }
 
     def create(self, validated_data):
+        avatar = validated_data.pop("avatar", None)
+
         user = User.objects.create_user(
             username=validated_data["username"],
             email=validated_data["email"],
             password=validated_data["password"],
             role=validated_data["role"]
         )
+
+        if avatar:
+            user.avatar = avatar
+            user.save()
 
         return user
 

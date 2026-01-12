@@ -11,21 +11,20 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os as os
 from django.core.files.storage import FileSystemStorage
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+USE_CLOUDINARY = True
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-MEDIA_ROOT = BASE_DIR / 'static' / 'uploads'  # project/static/uploads
-MEDIA_URL = '/static/uploads/'  # URL truy cập
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-7n_irvj#3dzgua@-diu$3hn-e6hsf33*lsiqbmrcbz00uu7!5n'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
