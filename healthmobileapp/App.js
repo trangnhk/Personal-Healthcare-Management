@@ -14,6 +14,9 @@ import { getCurrentUser } from "./src/services/account.services";
 import HealthDiaries from "./src/components/HealthDiaries";
 import NewExercise from "./src/screens/Home/NewExercise";
 import WorkoutPlanDetail from "./src/screens/WorkoutPlan/WorkoutPlanDetail";
+import ExerciseToWorkoutPlan from "./src/screens/WorkoutPlan/AddExerciseToWorkouPlan";
+import HealthDiaryDetail from "./src/screens/HealthDiary/HealthDiaryDetail";
+import HealthMetric from "./src/components/HealthMetric";
 
 const Stack = createNativeStackNavigator();
 
@@ -62,9 +65,24 @@ const StackNavigator = () => {
         options={{ title: "Kế hoạch tập luyện mới" }}
       />
       <Stack.Screen
+        name="AddExerciseToWorkoutPlan"
+        component={ExerciseToWorkoutPlan}
+        options={{ title: "Thêm bài tập vào kế hoạch tập luyện" }}
+      />
+      <Stack.Screen
         name="HealthDiaries"
         component={HealthDiaries}
         options={{ title: "Nhật ký" }}
+      />
+      <Stack.Screen
+        name="HealthDiaryDetail"
+        component={HealthDiaryDetail}
+        options={{ title: "Chi tiết nhật ký" }}
+      />
+      <Stack.Screen
+        name="HealthMetric"
+        component={HealthMetric}
+        options={{ title: "Chỉ số sức khỏe" }}
       />
       
     </Stack.Navigator>

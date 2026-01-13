@@ -8,7 +8,7 @@ import MyStyles from "../../styles/MyStyles";
 
 
 const NewExercise = () => {
-  const [name, setName] = useState("");
+    const [name, setName] = useState("");
     const [muscleGroup, setMuscleGroup] = useState("");
     const [description, setDescription] = useState("");
     const [calories, setCalories] = useState("");

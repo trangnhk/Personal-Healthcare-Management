@@ -1,11 +1,10 @@
-import { Button, Label } from "@react-navigation/elements";
 import React, { useContext, useState } from "react";
 import { View, Text, Image } from "react-native";
 import { MyUserContext } from "../../utils/contexts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi } from "../../services/Apis";
 import { endpoints } from "../../services/Endpoints";
-import { HelperText, TextInput } from "react-native-paper";
+import { Button, HelperText, TextInput } from "react-native-paper";
 import MyStyles from "../../styles/MyStyles";
 import { login } from "../../services/auth.services";
 

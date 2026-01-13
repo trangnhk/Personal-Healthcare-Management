@@ -1,21 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import { MyUserContext } from "../../utils/contexts";
-import { Alert, Image, ScrollView, Text, TouchableOpacity } from "react-native";
+import { Alert, Image, ScrollView, Text, TouchableOpacity, ViewBase } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View } from "react-native";
 import MyStyles from "../../styles/MyStyles";
 import { getCurrentUser } from "../../services/account.services";
 import { useNavigation } from "@react-navigation/native";
-import { Button, Card, Icon } from "react-native-paper";
+import { Button, Card, Icon, Modal, PaperProvider, Portal } from "react-native-paper";
 
 const AccountTab = () => {
     const [user, dispatch] = useContext(MyUserContext);
-    // const [loading, setLoading] = useState(false);
     const nav = useNavigation();
-
-    // console.info("USER: ",user);
-    // console.info("DISPATCH: ", dispatch);
-
+    const [showExpertModal, setShowExpertModal] = useState(false);
     
 
     const logout = () => {
@@ -53,8 +49,56 @@ const AccountTab = () => {
     if (!user)
         return null;
 
+    console.log(user);
 
     return (
+        <PaperProvider>
+
+        <Portal>
+                <Modal
+                    visible={showExpertModal}
+                    onDismiss={() => setShowExpertModal(false)}
+                    contentContainerStyle={{
+                        backgroundColor: "white",
+                        padding: 20,
+                        borderRadius: 10,
+                        margin: 20
+                    }}
+                >
+                    {user.experts ? (
+                        <View style={{ alignItems: "center" }}>
+                            {user.experts.avatar && (
+                                <Image
+                                    source={{ uri: user.experts.avatar }}
+                                    style={{ width: 80, height: 80, borderRadius: 40, marginBottom: 10 }}
+                                />
+                                )}
+                                {user.experts?.length ? (
+                                    user.experts.map(expert => (
+                                        <>
+                                        <Image source={{uri: `https://rinne308205.pythonanywhere.com${expert.avatar}`}}/>
+                                        <Text key={expert.id} style={MyStyles.text}>{expert.username}</Text>
+                                        </>
+                                        
+                                    ))
+                                ) : (
+                                    <Text>Chưa có chuyên gia</Text>
+                                )}
+
+                            <Button
+                                mode="contained"
+                                style={{ marginTop: 15 }}
+                                onPress={() => setShowExpertModal(false)}
+                            >
+                                Đóng
+                            </Button>
+                        </View>
+                    ) : (
+                        <Text>Bạn chưa có chuyên gia</Text>
+                    )}
+                </Modal>
+            </Portal>
+
         <ScrollView style={[MyStyles.padding, MyStyles.container]}>
             <Card style={{marginBlockEnd: 20}}>
                 <Card.Content>
@@ -77,7 +121,7 @@ const AccountTab = () => {
                         
                         <Text style={MyStyles.text}>Họ: {user.last_name}</Text>
                         <Text style={MyStyles.text}>Tên: {user.first_name}</Text>
-                        <Text style={MyStyles.text}>Ngày sinh: {user.dob} cm</Text>
+                        <Text style={MyStyles.text}>Ngày sinh: {user.dob}</Text>
                         <Text style={MyStyles.text}>Email: {user.email}</Text>
                         <Text style={[MyStyles.text, {color: "red"}]}>Vai trò: {user.role}</Text>
                         </View>
@@ -104,7 +148,7 @@ const AccountTab = () => {
                         <TouchableOpacity style={MyStyles.button} onPress={() =>{ nav.navigate("HealthDiaries")}}>
                             <Text style={MyStyles.textButton}>Nhật ký</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={MyStyles.button} onPress={() =>{}}>
+                        <TouchableOpacity style={MyStyles.button} onPress={() => setShowExpertModal(true)}>
                             <Text style={MyStyles.textButton}>Chuyên gia của tôi</Text>
                         </TouchableOpacity>
                     </View>
@@ -115,6 +159,7 @@ const AccountTab = () => {
                 <Text style={MyStyles.textButton}>Đăng xuất</Text>
             </TouchableOpacity>
         </ScrollView>
+        </PaperProvider>
     );
 
 };

@@ -20,6 +20,7 @@ const ExerciseDetail = () => {
             let res = await getExerciseDetail(exerciseId);
 
             setExercise(res.data);
+            console.log(exercise);
         } catch (err) {
             console.log(err);
         } finally {

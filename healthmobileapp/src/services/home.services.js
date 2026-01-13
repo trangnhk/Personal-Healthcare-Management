@@ -48,3 +48,14 @@ export const createExercise = async (data) => {
         },
     });
 };
+
+export const getHealthDiaries = async (cursor = null) => {
+    let url = '/healthdiaries/';
+    if (cursor)
+        url = cursor.replace(BASE_URL, "");
+
+    const token = await AsyncStorage.getItem("token");
+
+    
+    return authApi(token).get(url);
+};

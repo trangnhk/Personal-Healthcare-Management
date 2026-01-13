@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { getPublicExercises } from "../services/home.services";
 import { View, Text, TouchableOpacity, FlatList, Image } from "react-native";
 import { ActivityIndicator, Button, List, Searchbar } from "react-native-paper";
 import MyStyles from "../styles/MyStyles";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { MyUserContext } from "../utils/contexts";
 
 const Exercises = () => {
@@ -23,7 +23,6 @@ const Exercises = () => {
             if (loadMore && !next) return;
             setLoading(true);
 
-            console.log(loadMore ? "Loading next page:" : "Loading first page", next);
             let res = await getPublicExercises(search, loadMore ? next : null);
 
            if (loadMore) {
@@ -45,13 +44,19 @@ const Exercises = () => {
         }
     };
 
-    useEffect(() => {
+    useFocusEffect(useCallback(() => {
+        setExercises([]);
+        setNext(null);
+        setIsEndReached(false);
+
         let timer = setTimeout(() => {
             loadExercises();
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [search]);
+
+        }, [search])
+    )
 
     const renderItem = ({ item }) => (
         <TouchableOpacity activeOpacity={0.7} onPress={() =>{

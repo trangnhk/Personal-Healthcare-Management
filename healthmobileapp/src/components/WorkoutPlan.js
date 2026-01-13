@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import { useContext, useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Button, Text, TouchableOpacity, View, FlatList } from "react-native";
 import MyStyles from "../styles/MyStyles";
 import { ActivityIndicator, List } from "react-native-paper";
@@ -14,8 +14,6 @@ const WorkoutTab = () => {
     const [isEndReached, setIsEndReached] = useState(false);
     const nav = useNavigation();
     
-
-    // console.log("USER: ", user)
 
     const loadWorkoutplans = async(loadMore = false) => {
         try{
@@ -48,14 +46,20 @@ const WorkoutTab = () => {
 
     };
 
-    useEffect(() => {
-        loadWorkoutplans();
-    }, []);
+    useFocusEffect(useCallback(() => {
+        setWorkoutplans([]);
+        setNext(null);
+        setIsEndReached(false);
+
+        loadWorkoutplans(false);
+        }, [])
+    );
+
     
 
     const renderItem = ({item}) => (
         <TouchableOpacity activeOpacity={0.7} onPress={() =>{
-            nav.navigate("WorkoutPlanDetail", {workoutplanId: item.id})
+            nav.navigate("WorkoutPlanDetail", {workoutPlanId: item.id, workoutPlanTitle: item.title})
         }}>
             <List.Item style={MyStyles.padding}
                     title={item.title} titleStyle={MyStyles.word}
@@ -98,7 +102,7 @@ const WorkoutTab = () => {
             
             ): null}
 
-            <TouchableOpacity onPress={() => {nav.navigate('NewWorkoutPlan')}} style={MyStyles.button}>
+            <TouchableOpacity onPress={() => {nav.navigate('NewWorkoutPlan', {workoutPlanId: workoutplans.id, workoutPlanTitle: workoutplans.title})}} style={MyStyles.button}>
                 <Text style={MyStyles.textButton}>Tạo kế hoạch luyện tập mới</Text>
             </TouchableOpacity>
             
