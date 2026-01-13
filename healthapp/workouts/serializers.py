@@ -19,11 +19,12 @@ class ExerciseSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        request = self.context.get("request")
         data["created_by"] = (
             UserPublicSerializer(instance.created_by).data
             if instance.created_by else None
         )
-        if instance.image:
+        if instance.image and request:
             data["image"] = instance.image.url
         return data
 
@@ -50,7 +51,7 @@ class WorkoutPlanSerializer(ModelSerializer):
             "title",
             "created_date"
         ]
-        read_only_fields = ["id", "created_date"]
+        read_only_fields = ["id", "created_date", "user"]
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -82,8 +83,8 @@ class WorkoutPlanSerializer(ModelSerializer):
 
 
 class WorkoutPlanExerciseSerializer(ModelSerializer):
-    workout_plan = serializers.StringRelatedField()
-    exercise = serializers.StringRelatedField()
+    exercise = ExerciseSerializer(read_only=True)
+    workout_plan = serializers.PrimaryKeyRelatedField(read_only=True)
 
     exercise_id = serializers.PrimaryKeyRelatedField(
         queryset=Exercise.objects.all(),
@@ -113,6 +114,9 @@ class WorkoutPlanExerciseSerializer(ModelSerializer):
         workout_plan = self.context["workout_plan"]
         user = request.user
 
+        if request.method != "POST":
+            return exercise
+
         # Exercise PUBLIC
         if exercise.is_public:
             return exercise
@@ -122,11 +126,7 @@ class WorkoutPlanExerciseSerializer(ModelSerializer):
             return exercise
 
 
-        if (
-                workout_plan.expert
-                and exercise.created_by == workout_plan.expert
-                and user == workout_plan.user
-        ):
+        if (workout_plan.expert and exercise.created_by == workout_plan.expert and user == workout_plan.user):
             return exercise
 
         raise ValidationError("YOU DO NOT HAVE PERMISSION TO USE THIS EXERCISE")

@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from .paginators import HealthDiaryCursorPagination
 from .serializers import HealthMetricSerializer, HealthDiarySerializer, ReminderSerializer
 from .models import HealthMetric, HealthDiary, Reminder
 from workouts.models import WorkoutPlan
@@ -25,28 +26,9 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
 
         return HealthMetric.objects.filter(user=user, is_deleted=False).select_related("workout_plan").order_by("-recorded_at")
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data, context={"request": request})
-    #     serializer.is_valid(raise_exception=True)
-    #
-    #     metric = serializer.save()
-    #
-    #     return Response(self.get_serializer(metric).data, status=status.HTTP_201_CREATED)
-
-    # def update(self, request, *args, **kwargs):
-    #     metric = self.get_object()
-    #
-    #     if metric.user != request.user:
-    #         return ValidationError({"error": "YOU CANNOT UPDATE THIS METRIC"})
-    #
-    #     return super().update(request, *args, **kwargs)
-
     @action(methods=["post"], detail=True, url_path="soft_delete")
     def soft_delete(self, request):
         metric = self.get_object()
-
-        # if metric.user != request.user:
-        #     return ValidationError({"error": "YOU CANNOT DELETE THIS METRIC"})
 
         metric.soft_delete()
 
@@ -76,6 +58,7 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
 class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.DestroyAPIView, generics.UpdateAPIView):
     serializer_class = HealthDiarySerializer
     permission_classes = [perms.IsOwner]
+    pagination_class = HealthDiaryCursorPagination
     http_method_names = ["get", "post", "patch", "delete"]
 
     def get_queryset(self):
@@ -83,28 +66,6 @@ class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.List
 
         return HealthDiary.objects.filter(user=user).select_related("workout_plan").order_by("-created_date")
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data, context={"request": request})
-    #     serializer.is_valid(raise_exception=True)
-    #
-    #     diary = serializer.save()
-    #
-    #     return Response(self.get_serializer(diary).data, status=status.HTTP_201_CREATED)
-    #
-    # def destroy(self, request, *args, **kwargs):
-    #     diary = self.get_object()
-    #
-    #
-    #     diary.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # def update(self, request, *args, **kwargs):
-    #     diary = self.get_object()
-    #
-    #     if diary.user != request.user:
-    #         raise ValidationError({"error": "YOU CANNOT UPDATE THIS DIARY"})
-    #
-    #     return super().update(request, *args, **kwargs)
 
     @action(methods=["get"], detail=False, url_path="by-date")
     def get_diary_by_date(self, request):
@@ -164,15 +125,6 @@ class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
         user = self.request.user
 
         return Reminder.objects.filter(user=user).select_related("workout_plan").order_by("remind_at")
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data, context={"request": request})
-    #     serializer.is_valid(raise_exception=True)
-    #
-    #     reminder = serializer.save()
-    #
-    #     return Response(self.get_serializer(reminder).data, status=status.HTTP_201_CREATED)
-
 
     @action(methods=["post"], detail=True, url_path="set_done")
     def set_done_reminder(self, request, pk=None):

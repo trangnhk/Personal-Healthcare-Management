@@ -12,7 +12,7 @@ from .models import Exercise, WorkoutPlanExercise, WorkoutPlan
 from healthapp import perms
 from .perms import IsWorkoutPlanCreator, IsExerciseCreator, IsWorkoutPlanMember
 # IsWorkoutPlanExerciseCreator
-from .paginators import ExerciseCursorPagination, WorkoutPlanCursoPagination
+from .paginators import ExerciseCursorPagination, WorkoutPlanCursoPagination, WorkoutPlanExercisePagination
 
 
 class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView, generics.RetrieveAPIView):
@@ -55,6 +55,7 @@ class WorkoutPlanViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Create
     # permission_classes = [perms.IsOwner, IsCreator]
     http_method_names = ["get", "post", "patch"]
     pagination_class = WorkoutPlanCursoPagination
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_permissions(self):
         if self.action == "partial_update":
@@ -77,6 +78,8 @@ class WorkoutPlanExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generic
     serializer_class = WorkoutPlanExerciseSerializer
     http_method_names = ["get", "post"]
     permission_classes = [IsWorkoutPlanMember]
+    parser_classes = [MultiPartParser, FormParser]
+    pagination_class = WorkoutPlanExercisePagination
 
     def get_workout_plan(self):
         return get_object_or_404(WorkoutPlan, pk=self.kwargs["workout_plan_pk"])
