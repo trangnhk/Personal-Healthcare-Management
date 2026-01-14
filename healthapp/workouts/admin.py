@@ -26,6 +26,5 @@ class WorkoutPlanAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-# admin.site.register(WorkoutPlan)
 admin.site.register(WorkoutPlanExercise, WorkoutPlanExercisesAdmin)
 admin.site.register(Exercise, ExerciseAdmin)

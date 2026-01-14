@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register(r'exercises', ExerciseViewSet, basename='exercise')
 router.register(r'workout-plans', WorkoutPlanViewSet, basename='workout-plan')
 
-# nested: workout-plans/{id}/exercises --> List exercise in workout plan _ id
+
 workout_plan_router = NestedDefaultRouter(router, r'workout-plans', lookup='workout_plan')
 workout_plan_router.register(r'exercises', WorkoutPlanExerciseViewSet, basename='workout-plan-exercises')
 

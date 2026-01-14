@@ -46,10 +46,6 @@ class UserSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get("request")
-        #
-        # # Not allowed update another user
-        # if request and request.user != instance:
-        #     raise ValidationError({"error": "YOU CANNOT UPDATE ANOTHER USER!"})
 
         # update password
         new_password = validated_data.pop("password", None)
@@ -87,6 +83,7 @@ class RegisterSerializer(ModelSerializer):
 
     def create(self, validated_data):
         avatar = validated_data.pop("avatar", None)
+        role = validated_data["role"]
 
         user = User.objects.create_user(
             username=validated_data["username"],
@@ -98,6 +95,12 @@ class RegisterSerializer(ModelSerializer):
         if avatar:
             user.avatar = avatar
             user.save()
+
+        if role == UserRole.CLIENT:
+            ClientProfile.objects.create(user=user, height=0, weight=0, health_goal="Chưa thiết lập")
+
+        elif role == UserRole.EXPERT:
+            ExpertProfile.objects.create(user=user, experience=0, bio="Chưa thiết lập")
 
         return user
 

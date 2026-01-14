@@ -11,7 +11,6 @@ from .paginators import ChattingCursorPagination
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
-    # permission_classes = [perms.IsOwner]
     http_method_names = ["get", "post", "patch"]
 
     # permission
@@ -19,7 +18,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
         if self.action in ["create", "experts", "expert_detail"]:
             return [permissions.AllowAny()]
 
-        if self.action in ["current_user", "partial_update"]:
+        if self.action in ["current_user", "partial_update", "retrieve"]:
             return  [permissions.IsAuthenticated()]
 
         return [permissions.IsAdminUser()]

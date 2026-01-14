@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .paginators import HealthDiaryCursorPagination
+from .paginators import HealthDiaryCursorPagination, HealthMetricCusorPagination, RemindersPagination
 from .serializers import HealthMetricSerializer, HealthDiarySerializer, ReminderSerializer
 from .models import HealthMetric, HealthDiary, Reminder
 from workouts.models import WorkoutPlan
@@ -19,6 +19,8 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
                           generics.UpdateAPIView):
     serializer_class = HealthMetricSerializer
     permission_classes = [perms.IsOwner]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    pagination_class = HealthMetricCusorPagination
     http_method_names = ["get", "post", "patch"]
 
     def get_queryset(self):
@@ -27,7 +29,7 @@ class HealthMetricViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.Lis
         return HealthMetric.objects.filter(user=user, is_deleted=False).select_related("workout_plan").order_by("-recorded_at")
 
     @action(methods=["post"], detail=True, url_path="soft_delete")
-    def soft_delete(self, request):
+    def soft_delete(self, request, pk=None):
         metric = self.get_object()
 
         metric.soft_delete()
@@ -119,6 +121,7 @@ class HealthDiaryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.List
 class ReminderViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.UpdateAPIView, generics.DestroyAPIView):
     serializer_class = ReminderSerializer
     permission_classes = [perms.IsOwner]
+    pagination_class = RemindersPagination
     http_method_names = ["get", "post", "patch", "delete"]
 
     def get_queryset(self):

@@ -4,9 +4,10 @@ class ExerciseCursorPagination(CursorPagination):
     ordering = '-created_date'
 
 class WorkoutPlanCursoPagination(CursorPagination):
-    page_size = 2
+    page_size = 5
     ordering = ('-created_date', '-id')
 
 class WorkoutPlanExercisePagination(CursorPagination):
     page_size = 10
-    ordering = ('id',)
+    ordering = 'id'
+

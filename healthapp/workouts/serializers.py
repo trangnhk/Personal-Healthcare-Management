@@ -64,17 +64,7 @@ class WorkoutPlanSerializer(ModelSerializer):
         return WorkoutPlan.objects.create(user=user, expert=expert, **validated_data)
 
     def update(self, instance, validated_data):
-        # request = self.context.get("request")
-        # user = request.user
-        # expert = instance.expert
-        #
-        # print(f"USER: {user} - EXPERT: {expert}")
-        #
-        # if expert and not user.__eq__(expert):
-        #     raise ValidationError({"error": "THIS WORKOUT PLAN IS CREATED BY EXPERT! ONLY EXPERT CAN UPDATE"})
-        # # if instance.user != user:
-        # #         raise ValidationError({"error": "YOU CAN ONLY UPDATE YOUR OWN WORKOUT PLAN"})
-        # if instance.user.__eq__(user) or expert.__eq__(user):
+
         allowed_fields = {"title"}
         if set(validated_data.keys()) - allowed_fields:
             raise ValidationError({"error": "THIS FIELDS CANNOT BE UPDATED"})

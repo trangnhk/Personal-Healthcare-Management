@@ -6,17 +6,10 @@ class IsExerciseCreator(IsAuthenticated):
 
 class IsWorkoutPlanCreator(IsAuthenticated):
     def has_object_permission(self, request, view, obj):
-        if obj.expert is not None: # WP was created by expert -> ONLY EXPERT can update
+        if obj.expert is not None:
             return obj.expert == request.user
 
         return obj.user == request.user
-
-# class IsWorkoutPlanExerciseCreator(IsAuthenticated):
-#
-#     # Only user/expert in workoutplan can update exercise
-#     def has_object_permission(self, request, view, obj):
-#         plan = obj.workout_plan
-#         return request.user == plan.user or request.user == plan.expert
 
 class IsWorkoutPlanMember(IsAuthenticated):
     def has_permission(self, request, view):

@@ -30,6 +30,4 @@ class ReminderAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-# admin.site.register(HealthDiary, HealthDiaryAdmin)
 admin.site.register(HealthMetric, HealthMetricAdmin)
-# admin.site.register(Reminder, ReminderAdmin)

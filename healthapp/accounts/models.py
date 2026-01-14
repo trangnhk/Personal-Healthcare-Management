@@ -65,6 +65,8 @@ class ClientProfile(models.Model):
         return f"{self.user.get_full_name()}'s healthcare profile"
 
     def bmi(self):
+        if self.weight == 0 or self.height == 0:
+            return 0
         return round(self.weight / ((self.height / 100) ** 2), 2)
 
     def clean(self):

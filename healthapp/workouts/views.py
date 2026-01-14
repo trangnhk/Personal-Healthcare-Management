@@ -16,9 +16,7 @@ from .paginators import ExerciseCursorPagination, WorkoutPlanCursoPagination, Wo
 
 
 class ExerciseViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.DestroyAPIView, generics.UpdateAPIView, generics.RetrieveAPIView):
-    # queryset = Exercise.object.filter(is_public=True)
     serializer_class = ExerciseSerializer
-    # permission_classes = [perms.IsOwner]
     http_method_names = ["get", "post", "patch", "delete"]
     pagination_class = ExerciseCursorPagination
     filter_backends = [filters.SearchFilter]
@@ -64,7 +62,7 @@ class WorkoutPlanViewSet(viewsets.ViewSet, generics.ListAPIView, generics.Create
     def get_queryset(self):
         user = self.request.user
 
-        return WorkoutPlan.objects.filter(Q(user=user) | Q(expert=user)).order_by("-created_date")
+        return WorkoutPlan.objects.filter(Q(user=user) | Q(expert=user)).order_by("-created_date", "-id")
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={"request": request})
