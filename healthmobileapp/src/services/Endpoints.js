@@ -2,6 +2,7 @@ export const endpoints = {
     'register': '/users/',
     'login': '/o/token/',
     'currentUser': '/users/current-user/',
+    'userEdit': (userId) => `/users/${userId}/`,
     'experts': '/users/experts/',
     'expertDetail': (id) => `/users/${id}/expert-detail/`,
     'publicExercises': '/exercises/',
@@ -10,5 +11,10 @@ export const endpoints = {
     'healthdiaries': '/healthdiaries/',
     'healthdiariesByDate': '/healthdiaries/by-date/',
     'healthdiariesByWorkout': '/healthdiaries/by-workout/',
-    
+    'healthmetrics': '/healthmetrics/',
+    'healthmetricDelete': (metric_id) => `/healthmetrics/${metric_id}/soft_delete/`,
+    'reminders': '/reminders/',
+    'remindersEdit': (reminderId) => `/reminders/${reminderId}/`,
+    'remindersDone':  (reminderId) => `/reminders/${reminderId}/set_done`,
+    'chats': '/chats/'
 };

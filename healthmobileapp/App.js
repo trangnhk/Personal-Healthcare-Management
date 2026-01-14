@@ -17,6 +17,9 @@ import WorkoutPlanDetail from "./src/screens/WorkoutPlan/WorkoutPlanDetail";
 import ExerciseToWorkoutPlan from "./src/screens/WorkoutPlan/AddExerciseToWorkouPlan";
 import HealthDiaryDetail from "./src/screens/HealthDiary/HealthDiaryDetail";
 import HealthMetric from "./src/components/HealthMetric";
+import NewHealthMetric from "./src/screens/HealthMetric/NewHeaalthMetric";
+import AccountEdit from "./src/screens/User/AccountEdit";
+import Reminders from "./src/components/Reminders";
 
 const Stack = createNativeStackNavigator();
 
@@ -83,6 +86,21 @@ const StackNavigator = () => {
         name="HealthMetric"
         component={HealthMetric}
         options={{ title: "Chỉ số sức khỏe" }}
+      />
+      <Stack.Screen
+        name="NewHealthMetric"
+        component={NewHealthMetric}
+        options={{ title: "Thêm chỉ số sức khỏe" }}
+      />
+      <Stack.Screen
+        name="AccountEdit"
+        component={AccountEdit}
+        options={{ title: "Chỉnh sửa profile" }}
+      />
+      <Stack.Screen
+        name="Reminders"
+        component={Reminders}
+        options={{ title: "Báo thức" }}
       />
       
     </Stack.Navigator>

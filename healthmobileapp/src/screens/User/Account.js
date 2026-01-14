@@ -75,12 +75,12 @@ const AccountTab = () => {
                                 )}
                                 {user.experts?.length ? (
                                     user.experts.map(expert => (
-                                        <>
-                                        <Image source={{uri: `https://rinne308205.pythonanywhere.com${expert.avatar}`}}/>
-                                        <Text key={expert.id} style={MyStyles.text}>{expert.username}</Text>
-                                        </>
-                                        
+                                        <View key={expert.id} style={{ alignItems: "center", marginBottom: 10 }}>
+                                            <Image source={{ uri: `https://rinne308205.pythonanywhere.com${expert.avatar}` }} style={MyStyles.image}/>
+                                            <Text style={MyStyles.text}>{expert.username}</Text>
+                                        </View>
                                     ))
+
                                 ) : (
                                     <Text>Chưa có chuyên gia</Text>
                                 )}
@@ -102,7 +102,14 @@ const AccountTab = () => {
         <ScrollView style={[MyStyles.padding, MyStyles.container]}>
             <Card style={{marginBlockEnd: 20}}>
                 <Card.Content>
-                    <Button icon="account-edit" style={{marginStart: 600}} onPress={() => {}}>Chỉnh sửa</Button>
+                    <TouchableOpacity activeOpacity={0.7} onPress={() =>{
+                                                            nav.navigate("Reminders")
+                                                        }}>
+                    <Icon source={"alarm"} size={30} />
+                    </TouchableOpacity>
+                </Card.Content>
+                <Card.Content>
+                    <Button icon="account-edit" style={{marginStart: 600}} onPress={() => {nav.navigate("AccountEdit")}}>Chỉnh sửa</Button>
                 </Card.Content>
 
                 <Card.Content style={MyStyles.padding}>
@@ -150,6 +157,9 @@ const AccountTab = () => {
                         </TouchableOpacity>
                         <TouchableOpacity style={MyStyles.button} onPress={() => setShowExpertModal(true)}>
                             <Text style={MyStyles.textButton}>Chuyên gia của tôi</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={MyStyles.button} onPress={() => { nav.navigate("Reminders")}}>
+                            <Text style={MyStyles.textButton}>Báo thức của tôi</Text>
                         </TouchableOpacity>
                     </View>
                     

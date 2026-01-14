@@ -59,3 +59,29 @@ export const getHealthDiaries = async (cursor = null) => {
     
     return authApi(token).get(url);
 };
+
+export const getHealthMetrics = async (cursor = null) => {
+    let url = '/healthmetrics/';
+    if (cursor)
+        url = cursor.replace(BASE_URL, "");
+
+    const token = await AsyncStorage.getItem("token");
+
+    
+    return authApi(token).get(url);
+}
+
+export const postHealthMetric = async (data) => {
+    const token = await AsyncStorage.getItem("token");
+    return authApi(token).post(endpoints.healthmetrics, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+}
+
+export const destroyHealthMetric = async (healthMetricId) => {
+    const token = await AsyncStorage.getItem("token");
+
+    return authApi(token).post(endpoints.healthmetricDelete(healthMetricId));
+}

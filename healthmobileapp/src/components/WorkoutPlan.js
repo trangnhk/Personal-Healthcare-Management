@@ -81,24 +81,26 @@ const WorkoutTab = () => {
 
 
     return (
-        <View style={MyStyles.padding}>
+        <View style={[MyStyles.padding, {flex: 2.5}]}>
             <Text style={MyStyles.title}>Kế hoạch tập luyện của tôi</Text>
 
             {user ? (
-                <FlatList 
-                data={workoutplans}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-                onEndReached={() => {
-                    if (next && !loading && !isEndReached) {
-                        setIsEndReached(true);
-                        loadWorkoutplans(true);
-                    }
-                }}
-                onEndReachedThreshold={0.4}
-                onMomentumScrollBegin={() => setIsEndReached(false)}
-                ListFooterComponent={loading ? <ActivityIndicator/>: null}
-                />
+                <View style={{flex: 1.7}}>
+                    <FlatList 
+                        data={workoutplans}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.id.toString()}
+                        onEndReached={() => {
+                            if (next && !loading && !isEndReached) {
+                                setIsEndReached(true);
+                                loadWorkoutplans(true);
+                            }
+                        }}
+                        onEndReachedThreshold={0.4}
+                        onMomentumScrollBegin={() => setIsEndReached(false)}
+                        ListFooterComponent={loading ? <ActivityIndicator/>: null}
+                        />
+                </View>
             
             ): null}
 

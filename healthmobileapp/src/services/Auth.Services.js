@@ -25,5 +25,10 @@ export const login = (data) => {
   );
 };
 
-export const getCurrentUser = (token) =>
-  authApi(token).get(endpoints.currentUser);
+export const registerUser = (data) =>{
+  return publicApi.post(endpoints.register, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};

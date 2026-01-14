@@ -36,17 +36,34 @@ const Home = () => {
             </List.Section>
 
             {user?.role === "client" && (
-                <List.Section>
-                    <List.Subheader style={MyStyles.word}>Nhật ký (Diary)</List.Subheader>
-                    <List.Item
-                        style={MyStyles.padding}
-                        title="Xem danh sách nhật ký"
-                        titleStyle={{ fontSize: 20, fontWeight: 'bold' }}
-                        description="Nhấn vào đây để xem danh sách nhật ký"
-                        left={() => <List.Icon icon="book-account" />}
-                        onPress={() => nav.navigate("HealthDiaries")}
-                    />
-                </List.Section>
+                <View>
+                    <List.Section>
+                        <List.Subheader style={MyStyles.word}>Nhật ký (Diary)</List.Subheader>
+                        <List.Item
+                            style={MyStyles.padding}
+                            title="Xem danh sách nhật ký"
+                            titleStyle={{ fontSize: 20, fontWeight: 'bold' }}
+                            description="Nhấn vào đây để xem danh sách nhật ký"
+                            left={() => <List.Icon icon="book-account" />}
+                            onPress={() => nav.navigate("HealthDiaries")}
+                        />
+                    </List.Section>
+
+                    <List.Section>
+                        <List.Subheader style={MyStyles.word}>Chỉ số sức khỏe (Health Metric)</List.Subheader>
+                        <List.Item
+                            style={MyStyles.padding}
+                            title="Xem chỉ số sức khỏe"
+                            titleStyle={{ fontSize: 20, fontWeight: 'bold' }}
+                            description="Nhấn vào đây để xem chỉ số sức khỏe"
+                            left={() => <List.Icon icon="book-account" />}
+                            onPress={() => nav.navigate("HealthMetric")}
+                        />
+                    </List.Section>
+
+                </View>
+
+                
             )}
 
             

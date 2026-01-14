@@ -4,7 +4,7 @@ import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } fr
 import { MyUserContext } from "../../utils/contexts";
 import { getExerciseToWorkoutPlan } from "../../services/workout.services";
 import MyStyles from "../../styles/MyStyles";
-import { Card, List } from "react-native-paper";
+import { Card, Icon, List } from "react-native-paper";
 import MaterialIcons from "@react-native-vector-icons/material-icons";
 
 const WorkoutPlanDetail = () => {
@@ -48,7 +48,14 @@ const WorkoutPlanDetail = () => {
             {workoutplan && (
                 <Card style={{width: "100%", marginBottom: 40}}>
                     <Card.Content style={MyStyles.padding}>
-                        <Text style={MyStyles.title}>Kế hoạch tập luyện: {workoutPlanTitle}</Text>
+
+                        <View style={MyStyles.row} justifyContent="space-between" alignItems="center" >
+                            
+                            <Text style={MyStyles.title}>Kế hoạch tập luyện: {workoutPlanTitle}</Text>
+                            
+
+                        </View>
+                        
                         {workoutplan && workoutplan.map((item) => (
                         <List.Accordion
                             key={item.id}

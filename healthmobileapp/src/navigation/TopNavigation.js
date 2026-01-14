@@ -8,6 +8,7 @@ import RegisterTab from '../screens/User/Register';
 import AccountTab from '../screens/User/Account';
 import WorkoutTab from '../components/WorkoutPlan';
 import AccountExpertTab from '../screens/User/AccountExpert';
+import HealthMetric from '../components/HealthMetric';
 
 
 
@@ -44,10 +45,18 @@ const MainTopTabNavigator = () => {
             />
             {user.role === "client" ? <>
                 <Tab.Screen
+                name="HealthMetric"
+                component={HealthMetric}
+                options={{ title: "Chỉ số sức khỏe" , tabBarIcon: () => <Icon source="clipboard-account" size={35} color="#13785aff"/>}}
+                />
+                
+                <Tab.Screen
                 name="AccountTab"
                 component={AccountTab}
                 options={{ title: "Tài khoản" , tabBarIcon: () => <Icon source="account" size={35} color="#13785aff"/>}}
                 />
+
+                
             </> :
             <>
                 <Tab.Screen

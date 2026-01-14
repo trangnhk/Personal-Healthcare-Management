@@ -7,6 +7,7 @@ import { Icon, List } from "react-native-paper";
 import MyStyles from "../styles/MyStyles";
 import RenderHtml from 'react-native-render-html';
 import MaterialIcons from "@react-native-vector-icons/material-icons";
+import { formatDateTime } from "../utils/utilFunctions";
 
 
 
@@ -38,6 +39,7 @@ const HealthDiaries = () => {
             else{
                 setHealthDiaries(res.data.results);
             }
+            setNext(res.data.next);
         }
         catch (err){
             console.error(err);
@@ -57,6 +59,7 @@ const HealthDiaries = () => {
         }, [])
     );
 
+
     const renderItem= ({item}) => (
         <TouchableOpacity activeOpacity={0.7} onPress={() => nav.navigate("HealthDiaryDetail")}>
             
@@ -73,7 +76,7 @@ const HealthDiaries = () => {
                     )
                 }
             >
-                <List.Item title={`Ngày tạo: ${item.created_date}`} 
+                <List.Item title={`Ngày tạo: ${formatDateTime(item.created_date)}`} 
                             left={() => <Icon source={"calendar"} size={30}/>} 
                 />
 
